@@ -16,6 +16,9 @@
 #include "google/protobuf/compiler/java/test_multiple_file_no.pb.h"
 #include "google/protobuf/compiler/java/test_multiple_file_yes.pb.h"
 
+// Must be last.
+#include "google/protobuf/port_def.inc"
+
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -185,3 +188,5 @@ TEST(NameResolverTest, GetJavaClassNameMultipleFilesEnumEdition2023) {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
+
+#include "google/protobuf/port_undef.inc"
