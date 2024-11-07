@@ -17,3 +17,7 @@ enum NoPackageEnum {
 message NoPackageMessage {
   optional NoPackageEnum no_package_enum = 1;
 }
+
+service NoPackageProtoTestService {
+  rpc NoPackageMethod(NoPackageMessage) returns (NoPackageMessage);
+}
