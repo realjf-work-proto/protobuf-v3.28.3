@@ -10,10 +10,12 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "upb/base/descriptor_constants.h"
+#include "upb/base/string_view.h"
 #include "upb/message/array.h"
 #include "upb/message/internal/iterator.h"
 #include "upb/message/internal/map_entry.h"
@@ -202,15 +204,17 @@ static void _upb_MessageDebugString(txtenc* e, const upb_Message* msg,
   }
 
   if ((e->options & UPB_TXTENC_SKIPUNKNOWN) == 0) {
-    size_t size;
-    const char* ptr = upb_Message_GetUnknown(msg, &size);
-    if (size != 0) {
-      char* start = e->ptr;
-      upb_EpsCopyInputStream stream;
-      upb_EpsCopyInputStream_Init(&stream, &ptr, size, true);
-      if (!UPB_PRIVATE(_upb_TextEncode_Unknown)(e, ptr, &stream, -1)) {
-        /* Unknown failed to parse, back up and don't print it at all. */
-        e->ptr = start;
+    uintptr_t iter = kUpb_Message_UnknownBegin;
+    upb_StringView view;
+    while (upb_Message_NextUnknown(msg, &view, &iter)) {
+      if (view.size != 0) {
+        char* start = e->ptr;
+        upb_EpsCopyInputStream stream;
+        upb_EpsCopyInputStream_Init(&stream, &view.data, view.size, true);
+        if (!UPB_PRIVATE(_upb_TextEncode_Unknown)(e, view.data, &stream, -1)) {
+          /* Unknown failed to parse, back up and don't print it at all. */
+          e->ptr = start;
+        }
       }
     }
   }
